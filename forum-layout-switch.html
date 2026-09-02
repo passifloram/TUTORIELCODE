@@ -1,0 +1,110 @@
+<script>
+(function () {
+  var storageKey = "cj-forum-layout";
+  var root = document.documentElement;
+
+  function updateButton(button) {
+    var columnsActive =
+      root.getAttribute("data-forum-layout") === "columns";
+
+    button.setAttribute(
+      "aria-pressed",
+      columnsActive ? "true" : "false"
+    );
+
+    button.setAttribute(
+      "aria-label",
+      columnsActive
+        ? "Revenir à la disposition normale"
+        : "Afficher les forums en deux colonnes"
+    );
+
+    button.setAttribute(
+      "title",
+      columnsActive
+        ? "Disposition actuelle : deux colonnes"
+        : "Disposition actuelle : normale"
+    );
+  }
+
+  function installLayoutSwitch() {
+    var switcherooList =
+      document.querySelector(".switcheroo__squircles");
+
+    if (!switcherooList) {
+      return false;
+    }
+
+    var button =
+      document.querySelector(".forum-layout-toggle");
+
+    if (!button) {
+      button = document.createElement("button");
+      button.type = "button";
+      button.className = "forum-layout-toggle";
+
+      button.innerHTML =
+        '<i class="fa-solid fa-grip-lines" aria-hidden="true"></i>';
+
+      switcherooList.insertBefore(
+        button,
+        switcherooList.firstChild
+      );
+
+      button.addEventListener("click", function () {
+        var currentLayout =
+          root.getAttribute("data-forum-layout");
+
+        var newLayout =
+          currentLayout === "columns"
+            ? "normal"
+            : "columns";
+
+        root.setAttribute(
+          "data-forum-layout",
+          newLayout
+        );
+
+        localStorage.setItem(
+          storageKey,
+          newLayout
+        );
+
+        updateButton(button);
+      });
+    }
+
+    updateButton(button);
+    return true;
+  }
+
+  function startLayoutSwitch() {
+    if (installLayoutSwitch()) {
+      return;
+    }
+
+    var attempts = 0;
+
+    var timer = window.setInterval(function () {
+      attempts++;
+
+      if (
+        installLayoutSwitch() ||
+        attempts >= 40
+      ) {
+        window.clearInterval(timer);
+      }
+    }, 250);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      startLayoutSwitch
+    );
+  } else {
+    startLayoutSwitch();
+  }
+})();
+</script>
+```
