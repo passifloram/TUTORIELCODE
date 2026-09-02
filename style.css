@@ -1,0 +1,821 @@
+/* SWITCH DE DISPOSITION : DEUX COLONNES / MODE NORMAL
+   Le JavaScript ajoute l'une de ces deux valeurs sur <html> :
+   data-forum-layout="columns"
+   data-forum-layout="normal"
+   Le CSS utilise ensuite cet attribut pour choisir la disposition
+   sans avoir besoin de dupliquer le template index_box.
+   Ce code doit être ajouté APRÈS le CSS principal du forum.
+*/
+
+
+/* LARGEUR MINIMALE (OPTIONNEL)
+   J'utilise cette règle pcq pour ma part je veux conserver la présentation
+   de bureau sur les petits écrans.
+   Attention : sur téléphone, elle peut provoquer un défilement
+   horizontal donc supprime-la si tu préfères créer une vraie version
+   responsive.
+*/
+
+html,
+body {
+  min-width: 970px;
+}
+
+
+/* IMAGES DE REMPLISSAGE DES CATÉGORIES
+   Chaque catégorie Forumactif possède généralement un identifiant
+   comme #c1, #c2, #c3, etc.
+   Je donne à chaque catégorie une variable contenant son image.
+   Cette image sera utilisée uniquement si la catégorie possède
+   un nombre impair de forums en mode deux colonnes.
+   Il faut remplacer les URL ci-dessous par les vraies images.
+*/
+
+html[data-forum-layout="columns"] #c1 {
+  --forum-filler-image: url("URL_IMAGE_CATEGORIE_1");
+}
+
+html[data-forum-layout="columns"] #c2 {
+  --forum-filler-image: url("URL_IMAGE_CATEGORIE_2");
+}
+
+html[data-forum-layout="columns"] #c3 {
+  --forum-filler-image: url("URL_IMAGE_CATEGORIE_3");
+}
+
+
+/*
+   Variantes facultatives pour le thème sombre.
+*/
+
+html[data-forum-layout="columns"][data-color-scheme="dark"] #c1 {
+  --forum-filler-image: url("URL_SOMBRE_CATEGORIE_1");
+}
+
+html[data-forum-layout="columns"][data-color-scheme="dark"] #c2 {
+  --forum-filler-image: url("URL_SOMBRE_CATEGORIE_2");
+}
+
+html[data-forum-layout="columns"][data-color-scheme="dark"] #c3 {
+  --forum-filler-image: url("URL_SOMBRE_CATEGORIE_3");
+}
+
+
+/* GRILLE PRINCIPALE DU MODE DEUX COLONNES
+   .forums est le parent direct de toutes les cartes .forum.
+   Je le transforme en grille pour obtenir deux cartes par ligne.
+   minmax(0, 1fr) est important : le 0 permet à une colonne de
+   rétrécir même si elle contient un titre ou un lien très long.
+   Sans cela, certains contenus peuvent élargir la grille.
+*/
+
+html[data-forum-layout="columns"] .category .forums {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: stretch;
+}
+
+
+/* ORGANISATION INTERNE D'UNE CARTE
+   Chaque .forum contient cinq enfants directs :
+   - .forumtitle-box ;
+   - .forum_content ;
+   - .forum_stats ;
+   - .forum_lastpost_row ;
+   - .forum_subforums.
+*/
+
+html[data-forum-layout="columns"]
+.category
+.forums > .forum {
+  display: grid;
+
+  /*
+     La première colonne de 76 px accueille les statistiques.
+     La deuxième colonne utilise tout l'espace restant.
+  */
+  grid-template-columns:
+    76px
+    minmax(0, 1fr);
+  
+  grid-template-areas:
+    "heading heading"
+    "description description"
+    "stats lastpost"
+    "subforums subforums";
+
+  column-gap: 10px;
+
+  /*
+     min-width: 0 évite que le contenu d'un enfant impose
+     une largeur supérieure à celle de la carte.
+  */
+  min-width: 0;
+
+  /*
+     La carte occupe toute la hauteur disponible dans sa rangée.
+  */
+  height: 100%;
+
+  /*
+     L'espacement vertical est déjà assuré par gap sur .forums.
+  */
+  margin-bottom: 0;
+}
+
+
+/* ATTRIBUTION DES ZONES DE LA CARTE
+   Le symbole > indique que les blocs doivent être des enfants
+   directs de .forum.
+   S'ils sont déplacés ou imbriqués dans un autre conteneur,
+   ces règles ne pourront plus les sélectionner correctement.
+*/
+
+html[data-forum-layout="columns"]
+.category
+.forum > .forumtitle-box {
+  grid-area: heading;
+  min-width: 0;
+}
+
+html[data-forum-layout="columns"]
+.category
+.forum > .forum_content {
+  grid-area: description;
+
+  width: 100%;
+  min-width: 0;
+
+  /*
+     Je limite la hauteur de la description pour éviter qu'une carte
+     contenant beaucoup de texte devienne plus haute que sa voisine.
+  */
+  height: 80px;
+  overflow: hidden;
+}
+
+html[data-forum-layout="columns"]
+.category
+.forum > .forum_stats {
+  grid-area: stats;
+}
+
+html[data-forum-layout="columns"]
+.category
+.forum > .forum_lastpost_row {
+  grid-area: lastpost;
+}
+
+html[data-forum-layout="columns"]
+.category
+.forum > .forum_subforums {
+  grid-area: subforums;
+}
+
+
+/* STATISTIQUES EN MODE DEUX COLONNES
+   Dans la disposition normale, les statistiques avaient davantage
+   de place. Une fois la carte divisée en deux, elles prenaient trop
+   de largeur.
+   Je les affiche donc verticalement dans une zone fixe de 76 px.
+*/
+
+html[data-forum-layout="columns"]
+.category
+.forum > .forum_stats {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 2px;
+
+  width: 76px;
+  height: 80px;
+
+  margin-top: 10px;
+  padding: 4px;
+
+  /*
+     Ces propriétés retirent l'ancien fond éventuel des statistiques.
+     Elles peuvent être adaptées si tu veux conserver un encadré.
+  */
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html[data-forum-layout="columns"]
+.category
+.forum > .forum_stats span {
+  display: flex;
+  align-items: center;
+
+  gap: 3px;
+
+  width: 100%;
+  line-height: 16px;
+
+  /*
+     Je garde chaque statistique sur une seule ligne.
+  */
+  white-space: nowrap;
+}
+
+
+/* AVATAR ET DERNIER MESSAGE EN MODE DEUX COLONNES
+   Le bloc complet mesure 80 px de haut, comme les statistiques.
+*/
+
+html[data-forum-layout="columns"]
+.category
+.forum > .forum_lastpost_row {
+  display: flex;
+  align-items: stretch;
+
+  gap: 10px;
+
+  width: 100%;
+  min-width: 0;
+  height: 80px;
+
+  margin-top: 10px;
+}
+
+html[data-forum-layout="columns"]
+.category
+.forum_lastpost_row
+.forum_avatar {
+  /*
+     L'avatar ne grandit pas et ne rétrécit pas.
+  */
+  flex: 0 0 70px;
+
+  width: 70px;
+  height: 80px;
+}
+
+html[data-forum-layout="columns"]
+.category
+.forum_lastpost_row
+.forum_lastpost {
+  display: flex;
+
+  /*
+     Cette partie récupère toute la largeur restante.
+  */
+  flex: 1 1 auto;
+  flex-direction: column;
+
+  align-items: flex-end;
+  justify-content: center;
+
+  width: auto;
+  min-width: 0;
+  height: 80px;
+
+  padding: 8px 10px;
+
+  /*
+     Si le contenu est trop long, il reste à l'intérieur du bloc.
+  */
+  overflow: hidden;
+}
+
+
+/* TITRE DU DERNIER SUJET TROP LONG
+   Cette règle concerne les DEUX dispositions. Je la place donc
+   en dehors des parties réservées exclusivement à un mode.
+   Le titre est coupé avec des points de suspension au lieu
+   d'élargir la carte.
+   display: block place aussi les informations du dernier message
+   sur la ligne suivante. Il ne faut donc pas ajouter de <br>
+   après le lien dans index_box.
+*/
+
+html[data-forum-layout="columns"]
+.category
+.forum > .forum_lastpost_row
+.forum_lastpost > span > a.lastpost_link,
+
+html[data-forum-layout="normal"]
+.category
+.forum > .forum_lastpost_row
+.forum_lastpost > span > a.lastpost_link {
+  display: block !important;
+
+  width: 100% !important;
+  max-width: 100% !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow: hidden !important;
+
+  line-height: 21px !important;
+  text-align: right !important;
+
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+
+/* SOUS-FORUMS EN MODE DEUX COLONNES
+   Le problème rencontré était que les cartes contenant beaucoup
+   de sous-forums devenaient plus hautes que les autres.
+   Je réserve donc toujours une zone de 38 px, même lorsqu'une carte
+   ne contient aucun sous-forum.
+*/
+
+html[data-forum-layout="columns"]
+.category
+.forum > .forum_subforums {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  min-width: 0;
+
+  height: 38px;
+  min-height: 38px;
+  max-height: 38px;
+
+  margin-top: 6px;
+  padding: 0;
+
+  /*
+     Le contenu supplémentaire ne doit pas agrandir la carte.
+  */
+  overflow: hidden;
+}
+
+html[data-forum-layout="columns"]
+.category
+.forum_subforums
+#subforum {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+
+  gap: 5px 0;
+
+  width: 100%;
+  max-height: 36px;
+
+  overflow: hidden;
+}
+
+
+/* RÉDUCTION DES LIENS DE SOUS-FORUMS
+   :has(a:nth-of-type(5)) signifie que le conteneur possède
+   au moins cinq liens.
+   À partir de cinq liens, je réduis légèrement leur taille.
+   À partir de sept liens, je les compacte davantage.
+   Cela permet de préserver l'alignement des cartes tout en gardant
+   les liens aussi lisibles que possible.
+   Comme expliquer sur le tuto, j'ai changé d'avis et mis finalement un carrousel.
+*/
+
+html[data-forum-layout="columns"]
+.category
+.forum_subforums
+#subforum:has(a:nth-of-type(5))
+a {
+  margin-right: 6px !important;
+
+  font-size: 10px !important;
+  line-height: 15px !important;
+}
+
+html[data-forum-layout="columns"]
+.category
+.forum_subforums
+#subforum:has(a:nth-of-type(7))
+a {
+  margin-right: 4px !important;
+  padding: 0 !important;
+
+  font-size: 9px !important;
+  line-height: 14px !important;
+}
+
+
+/* IMAGE AJOUTÉE AUX CATÉGORIES IMPAIRES
+  
+   Après avoir créé les deux colonnes, certaines catégories
+   se terminaient avec un seul forum sur la dernière ligne.
+   Le nombre de forums visibles peut changer selon que la personne est invitée,
+   membre ou appartient à un groupe particulier.
+   Cette règle vérifie donc le nombre de forums réellement affichés.
+   Elle sélectionne .forums lorsque son dernier enfant .forum
+   occupe une position impaire, puis crée une fausse carte avec
+   le pseudo-élément ::after.
+*/
+
+html[data-forum-layout="columns"]
+.category
+.forums:has(> .forum:nth-child(odd):last-child)::after {
+  /*
+     Un pseudo-élément a besoin de content pour exister.
+     Il reste vide, car la carte est seulement décorative.
+  */
+  content: "";
+
+  display: block;
+  align-self: stretch;
+
+  width: 100%;
+  min-width: 0;
+
+  /*
+     Cette couleur reste visible si l'image ne charge pas.
+  */
+  background-color: var(--neutralDark);
+
+  /*
+     Le dégradé assombrit légèrement l'image pour mieux l'intégrer
+     au reste du thème.
+     --forum-filler-image correspond à la variable définie plus haut
+     pour #c1, #c2, #c3, etc.
+  */
+  background-image:
+    linear-gradient(
+      rgba(23, 25, 56, 0.08),
+      rgba(23, 25, 56, 0.30)
+    ),
+    var(--forum-filler-image);
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  border-radius: var(--radius-normal);
+
+  opacity: 0.82;
+  filter: grayscale(40%);
+
+  transition:
+    opacity 0.6s ease,
+    filter 0.6s ease,
+    background-position 0.8s ease;
+}
+
+
+/*
+   Petit effet facultatif au survol de l'image décorative.
+   Tu peux supprimer cette règle si tu préfères une image fixe.
+*/
+
+html[data-forum-layout="columns"]
+.category
+.forums:has(> .forum:nth-child(odd):last-child)::after:hover {
+  opacity: 1;
+  filter: grayscale(0%);
+  background-position: 50% 45%;
+}
+
+
+/* RESTAURATION DU MODE NORMAL
+   Le mode normal utilise exactement le même HTML.
+   Je remets simplement .forums en affichage classique pour obtenir
+   une carte pleine largeur par ligne.
+*/
+
+html[data-forum-layout="normal"]
+.category
+.forums {
+  display: block;
+}
+
+
+/*
+   La fausse carte utilisée en mode deux colonnes doit disparaître
+   complètement dans la disposition normale.
+*/
+
+html[data-forum-layout="normal"]
+.category
+.forums::before,
+
+html[data-forum-layout="normal"]
+.category
+.forums::after {
+  display: none !important;
+  content: none !important;
+}
+
+
+/* ORGANISATION D'UNE CARTE EN MODE NORMAL
+
+   La carte retrouve deux grandes colonnes internes :
+   - une partie flexible pour la description et les sous-forums ;
+   - une partie fixe de 280 px pour le dernier message.
+*/
+
+html[data-forum-layout="normal"]
+.category
+.forums > .forum {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    280px;
+
+  grid-template-areas:
+    "heading heading"
+    "description lastpost"
+    "subforums stats";
+
+  gap: 0 10px;
+
+  width: 100%;
+  height: auto;
+
+  margin-bottom: 10px;
+}
+
+
+/*
+   Même si certaines zones possèdent déjà leur grid-area dans
+   le CSS principal, je les rappelle ici pour que ce bloc puisse
+   fonctionner de manière autonome.
+*/
+
+html[data-forum-layout="normal"]
+.category
+.forum > .forumtitle-box {
+  grid-area: heading;
+  min-width: 0;
+}
+
+html[data-forum-layout="normal"]
+.category
+.forum > .forum_content {
+  grid-area: description;
+  min-width: 0;
+}
+
+html[data-forum-layout="normal"]
+.category
+.forum > .forum_stats {
+  grid-area: stats;
+}
+
+html[data-forum-layout="normal"]
+.category
+.forum > .forum_lastpost_row {
+  grid-area: lastpost;
+}
+
+html[data-forum-layout="normal"]
+.category
+.forum > .forum_subforums {
+  grid-area: subforums;
+}
+
+
+/* DERNIER MESSAGE EN MODE NORMAL
+   La zone retrouve une largeur fixe de 280 px :
+   - 70 px pour l'avatar ;
+   - 200 px pour le dernier message ;
+   - 10 px d'espace entre les deux.
+*/
+
+html[data-forum-layout="normal"]
+.category
+.forum > .forum_lastpost_row {
+  display: flex;
+  align-items: stretch;
+
+  gap: 10px;
+
+  width: 280px;
+  height: 80px;
+
+  margin-top: 10px;
+}
+
+html[data-forum-layout="normal"]
+.category
+.forum_lastpost_row
+.forum_avatar {
+  flex: 0 0 70px;
+
+  width: 70px;
+  height: 80px;
+}
+
+html[data-forum-layout="normal"]
+.category
+.forum_lastpost_row
+.forum_lastpost {
+  flex: 0 0 200px;
+
+  width: 200px;
+  height: 80px;
+}
+
+
+/* APPARENCE DES SOUS-FORUMS EN MODE NORMAL
+   En deux colonnes, les liens doivent rester compacts.
+   Dans le mode normal, j'ai davantage de place. Je peux donc
+   restaurer l'ancienne apparence sous forme de petits badges
+   avec un dégradé.
+   Cette partie est facultative : supprime-la si ton CSS principal
+   possède déjà le rendu voulu.
+*/
+
+html[data-forum-layout="normal"]
+.category
+.forum_subforums
+#subforum a {
+  display: inline-flex !important;
+
+  width: auto !important;
+
+  margin:
+    0
+    10px
+    0
+    0 !important;
+
+  padding:
+    2px
+    8px !important;
+
+  color: var(--stay-white) !important;
+
+  background:
+    linear-gradient(
+      0.07turn,
+      var(--one),
+      var(--two)
+    ) !important;
+
+  border: 0 !important;
+  border-radius: var(--radius-mini) !important;
+
+  text-transform: uppercase !important;
+  text-decoration: none !important;
+}
+
+
+/*
+   Si le thème ajoute déjà un pseudo-élément après les liens,
+   je le masque dans le mode normal pour éviter un doublon.
+*/
+
+html[data-forum-layout="normal"]
+.category
+.forum_subforums
+#subforum a::after {
+  display: none !important;
+  content: none !important;
+}
+
+
+/* BOUTON DE CHANGEMENT DE DISPOSITION
+   Le JavaScript ajoute le bouton directement dans :
+   .switcheroo__squircles
+   Je cible un enfant direct avec > pour éviter
+   de modifier un autre bouton
+*/
+
+.switcheroo__squircles > .forum-layout-toggle {
+  display: inline-flex !important;
+  flex: 0 0 35px !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 35px !important;
+  min-width: 35px !important;
+  height: 35px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: var(--textColor) !important;
+
+  /*
+     Je retire tous les styles natifs du bouton pour qu'il s'intègre
+     visuellement aux autres éléments de Switcheroo.
+  */
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+
+  outline: 0 !important;
+  box-shadow: none !important;
+
+  appearance: none !important;
+
+  cursor: pointer !important;
+
+  position: relative !important;
+  inset: auto !important;
+
+  line-height: 1 !important;
+
+  transition:
+    color 0.3s ease !important;
+}
+
+
+/* COULEUR DU BOUTON SELON LE THÈME
+   Au départ, j'utilisais une couleur toujours blanche.
+   Le bouton devenait donc invisible sur le thème clair.
+   J'utilise maintenant une couleur sombre en mode clair
+   et une couleur claire en mode sombre.
+   Ces variables dépendent de mon thème et devront éventuellement
+   être remplacées par les tiennes.
+*/
+
+html[data-color-scheme="light"]
+.switcheroo__squircles > .forum-layout-toggle {
+  color: var(--contrastDark) !important;
+}
+
+html[data-color-scheme="dark"]
+.switcheroo__squircles > .forum-layout-toggle {
+  color: var(--contrastLight) !important;
+}
+
+
+/* ICÔNE DU BOUTON
+   L'icône fa-grip-lines vient de Font Awesome.
+   Son orientation permet de reconnaître visuellement
+   le mode actuellement actif :
+   - verticale en mode deux colonnes ;
+   - horizontale en mode normal.
+*/
+
+.switcheroo__squircles
+> .forum-layout-toggle
+.fa-grip-lines {
+  display: block !important;
+
+  color: inherit !important;
+
+  font-size: 18px !important;
+  line-height: 1 !important;
+
+  transform: rotate(0deg) !important;
+
+  transition:
+    transform 0.35s ease,
+    color 0.3s ease !important;
+}
+
+
+/* Icône verticale lorsque les deux colonnes sont actives */
+
+html[data-forum-layout="columns"]
+.switcheroo__squircles
+> .forum-layout-toggle
+.fa-grip-lines {
+  transform: rotate(90deg) !important;
+}
+
+
+/* Icône horizontale lorsque la disposition normale est active */
+
+html[data-forum-layout="normal"]
+.switcheroo__squircles
+> .forum-layout-toggle
+.fa-grip-lines {
+  transform: rotate(0deg) !important;
+}
+
+
+/* SURVOL ET FOCUS DU BOUTON
+   Le survol reprend la couleur d'accent du thème.
+
+   J'ajoute aussi :focus-visible pour que les personnes naviguant
+   au clavier puissent repérer le bouton sélectionné.
+*/
+
+.switcheroo__squircles
+> .forum-layout-toggle:hover {
+  color: var(--accentClr) !important;
+  background: transparent !important;
+}
+
+.switcheroo__squircles
+> .forum-layout-toggle:focus-visible {
+  color: var(--accentClr) !important;
+
+  outline:
+    2px solid
+    var(--accentClr) !important;
+
+  outline-offset: 3px !important;
+}
+
+
+/* FIN DU SWITCH DE DISPOSITION */
