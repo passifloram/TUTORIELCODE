@@ -1,50 +1,28 @@
-<!-- APPLIQUER LA DISPOSITION AVANT L'AFFICHAGE DE LA PAGE
-     Ce script est placé tout en haut du template afin que le
-     navigateur connaisse la disposition à utiliser. Sans le script
-     la page pourrait d'abord apparaître en mode normal puis passer 
-     brusquement en deux colonnes après son chargement.
+<!--  Je récupère le mode ici, avant les catégories, pour éviter que l’index s’affiche d’abord normalement avant de passer en deux colonnes.
+  Si aucun choix n’a encore été enregistré, j’utilise "columns".
 -->
 
 <script>
 (function () {
-
-  /*
-   * On cherche dans localStorage le dernier choix de l'utilisateur.
-   * Valeurs possibles :
-   * - "columns" : affichage en deux colonnes ;
-   * - "normal"  : affichage classique sur une colonne.
-   * Si aucun choix n'a encore été enregistré, "columns"
-   * devient la valeur utilisée par défaut.
-   */
   var savedLayout =
     localStorage.getItem("cj-forum-layout") || "columns";
 
-  /*
-   * On place le choix directement sur la balise <html>.
-   * Le résultat sera par exemple :
-   * <html data-forum-layout="columns">
-   * ou :
-   * <html data-forum-layout="normal">
-   * Le CSS pourra ensuite détecter cet attribut et appliquer la disposition correspondante.
-   */
   document.documentElement.setAttribute(
     "data-forum-layout",
     savedLayout
   );
-
 })();
 </script>
 
 
 <!-- BARRE DE LIENS SITUÉE AU-DESSUS DES CATÉGORIES
-     Cette barre n'est pas un enfant d'une catégorie.
-     Elle se trouve avant la boucle catrow et reste donc indépendante de la grille contenant les forums.
+     cette barre n'est pas un enfant d'une catégorie. Elle se trouve avant la boucle catrow 
+     et reste donc indépendante de la grille contenant les forums.
 -->
 <div class="links_bar">
 
   <!--
-       Ce bloc Forumactif est affiché uniquement si
-       l'utilisateur est connecté.
+       ce bloc forumactif est affiché uniquement si l'utilisateur est connecté.
   -->
   <!-- BEGIN switch_user_logged_in -->
 
@@ -88,50 +66,28 @@
 </div>
 
 
-<!-- BOUCLE GÉNÉRALE DES CATÉGORIES
-     catrow représente l'ensemble des catégories transmises
-     par Forumactif. Pour chaque catégorie, Forumactif va générer :
-     - son en-tête avec tablehead
-     - tous ses forums avec forumrow 
-     - sa fermeture avec tablefoot
+<!--
+  Forumactif répète catrow pour chaque catégorie.
+  tablehead ouvre la catégorie et son conteneur .forums.
+  forumrow ajoute ensuite chaque carte à l’intérieur.
+  tablefoot referme les deux conteneurs une fois tous les forums générés.
 -->
+
 <!-- BEGIN catrow -->
 
+<!-- BEGIN tablehead -->
+<div class="category" id="{catrow.tablehead.ID}">
 
-  <!-- OUVERTURE D'UNE CATÉGORIE -->
-  <!-- BEGIN tablehead -->
+  <div class="cate_title">
+    {catrow.tablehead.L_FORUM}
+  </div>
 
   <!--
-       .category est le parent général d'une catégorie.
-       L'identifiant généré par Forumactif sera généralement : c1, c2, c3 etc.
-       Exemple du HTML obtenu : <div class="category" id="c1">
-       Cet identifiant nous permettra notamment d'attribuer une image décorative différente à chaque catégorie.
+    .forums est le parent direct de toutes les cartes .forum.
+    C’est lui qui devient une grille de deux colonnes dans le CSS.
   -->
-  <div
-    class="category"
-    id="{catrow.tablehead.ID}"
-  >
-
-    <!--
-         Premier enfant direct de .category :
-         le titre de la catégorie.
-    -->
-    <div class="cate_title">
-      {catrow.tablehead.L_FORUM}
-    </div>
-
-    <!--
-         Deuxième enfant direct de .category : le conteneur de tous les forums de cette catégorie.
-         C'est CE conteneur qui devient une grille en mode
-         deux colonnes :
-         .category .forums {
-           display: grid;
-         }
-         Ses enfants directs seront donc toutes les cartes .forum.
-    -->
-    <div class="forums">
-
-  <!-- END tablehead -->
+  <div class="forums">
+<!-- END tablehead -->
 
 
   <!-- BOUCLE DES FORUMS DE LA CATÉGORIE
@@ -147,8 +103,6 @@
               .forum
            Cette relation est importante, car le CSS utilise :
            .forums > .forum
-           Le symbole > signifie :
-           "sélectionner uniquement les enfants directs".
       -->
       <div
         class="forum row {catrow.forumrow.FOLDER_CLASSNAME}"
