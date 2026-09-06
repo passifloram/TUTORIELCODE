@@ -1,5 +1,5 @@
 <!--  Je récupère le mode ici, avant les catégories, pour éviter que l’index s’affiche d’abord normalement avant de passer en deux colonnes.
-  Si aucun choix n’a encore été enregistré, j’utilise "columns".
+  Si aucun choix n’a encore été enregistré, j’utilise "columns"
 -->
 
 <script>
@@ -13,25 +13,20 @@
   );
 })();
 </script>
-
-
 <!-- BARRE DE LIENS SITUÉE AU-DESSUS DES CATÉGORIES
-     cette barre n'est pas un enfant d'une catégorie. Elle se trouve avant la boucle catrow 
-     et reste donc indépendante de la grille contenant les forums.
+     cette barre n'est pas un enfant d'une catégorie pcq elle se trouve avant la boucle catrow 
+     et reste donc indépendante de la grille contenant les forums
 -->
 <div class="links_bar">
 
   <!--
-       ce bloc forumactif est affiché uniquement si l'utilisateur est connecté.
+       bloc affiché uniquement si l'utilisateur est connecté
   -->
   <!-- BEGIN switch_user_logged_in -->
 
   <span>
 
-    <a
-      id="lastvisit_posts"
-      href="{U_SEARCH_NEW}"
-    >
+    <a id="lastvisit_posts" href="{U_SEARCH_NEW}">
       Messages depuis la dernière visite
     </a>
 
@@ -43,21 +38,13 @@
 
     &nbsp;•&nbsp;
 
-    <a
-      id="posts_unanswered"
-      href="{U_SEARCH_UNANSWERED}"
-    >
+    <a id="posts_unanswered" href="{U_SEARCH_UNANSWERED}">
       Messages sans réponse
     </a>
 
   </span>
 
-  <a
-    class="specials_links right"
-    id="mark_read"
-    href="{U_MARK_READ}"
-    accesskey="m"
-  >
+  <a class="specials_links right" id="mark_read" href="{U_MARK_READ}" accesskey="m">
     Tout marquer comme lu
   </a>
 
@@ -67,10 +54,10 @@
 
 
 <!--
-  Forumactif répète catrow pour chaque catégorie.
-  tablehead ouvre la catégorie et son conteneur .forums.
-  forumrow ajoute ensuite chaque carte à l’intérieur.
-  tablefoot referme les deux conteneurs une fois tous les forums générés.
+  Forumactif répète catrow pour chaque catégorie
+  tablehead ouvre la catégorie et son conteneur .forums
+  forumrow ajoute ensuite chaque carte à l’intérieur
+  tablefoot referme les deux conteneurs une fois tous les forums générés
 -->
 
 <!-- BEGIN catrow -->
@@ -83,15 +70,15 @@
   </div>
 
   <!--
-    .forums est le parent direct de toutes les cartes .forum.
-    C’est lui qui devient une grille de deux colonnes dans le CSS.
+    .forums est le parent direct de toutes les cartes .forum
+    C’est lui qui devient une grille de deux colonnes dans le CSS
   -->
   <div class="forums">
 <!-- END tablehead -->
 
 
   <!-- BOUCLE DES FORUMS DE LA CATÉGORIE
-       Forumactif répète tout ce bloc une fois par forum. Par exemple, si la catégorie contient quatre forums,
+       Forumactif répète tout ce bloc une fois par forum. Par exemple, si la catégorie contient quatre forums 
        quatre éléments <div class="forum"> seront créés  à l'intérieur du même conteneur .forums.
   -->
   <!-- BEGIN forumrow -->
@@ -104,9 +91,7 @@
            Cette relation est importante, car le CSS utilise :
            .forums > .forum
       -->
-      <div
-        class="forum row {catrow.forumrow.FOLDER_CLASSNAME}"
-      >
+      <div class="forum row {catrow.forumrow.FOLDER_CLASSNAME}">
 
 
         <!-- ENFANT 1 : EN-TÊTE DU FORUM
@@ -122,10 +107,7 @@
           <!-- Partie gauche de l'en-tête : nom du forum -->
           <div class="forumtitle-box-left">
 
-            <a
-              href="{catrow.forumrow.U_VIEWFORUM}"
-              class="forumtitle"
-            >
+            <a href="{catrow.forumrow.U_VIEWFORUM}" class="forumtitle">
               {catrow.forumrow.FORUM_NAME}
             </a>
 
@@ -152,8 +134,8 @@
 
         <!-- ENFANT 2 : DESCRIPTION DU FORUM
             En mode deux colonnes, cette zone reçoit : grid-area: description
-             Le conteneur .forum_content sert à la disposition.
-             Le conteneur interne .forum_desc conserve les styles existants de la description.
+             Le conteneur .forum_content sert à la disposition
+             Le conteneur interne .forum_desc conserve les styles existants de la description
         -->
         <div class="forum_content">
 
@@ -170,7 +152,7 @@
              - le nombre de sujets 
              - le nombre de messages
              En mode deux colonnes, elle reçoit : grid-area: stats
-             Je l'ai placée à gauche de la zone du dernier message.
+             Je l'ai placée à gauche de la zone du dernier message
         -->
         <div class="forum_stats">
 
@@ -202,9 +184,6 @@
           -->
           <div class="forum_avatar lastpostavatar">
 
-            <!--
-                 Forumactif n'affiche ce contenu que lorsqu'un avatar est disponible dans ce contexte.
-            -->
             <!-- BEGIN avatar -->
 
             {catrow.forumrow.avatar.LAST_POST_AVATAR}
@@ -223,21 +202,17 @@
 
             <!--
                  Ce span regroupe les informations générées
-                 par Forumactif.
+                 par forumactif
             -->
             <span>
 
               <!--
-                   Le titre du dernier sujet n'est produit que lorsque
-                   l'option correspondante est disponible.
+                   le titre du dernier sujet n'est produit que lorsque
+                   l'option correspondante est disponible
               -->
               <!-- BEGIN switch_topic_title -->
 
-              <a
-                href="{catrow.forumrow.U_LATEST_TOPIC}"
-                title="{catrow.forumrow.LATEST_TOPIC_TITLE}"
-                class="lastpost_link"
-              >
+              <a href="{catrow.forumrow.U_LATEST_TOPIC}" title="{catrow.forumrow.LATEST_TOPIC_TITLE}" class="lastpost_link">
                 {catrow.forumrow.LATEST_TOPIC_NAME}
               </a>
 
@@ -246,7 +221,7 @@
               <!--
                    Cette variable ajoute les autres informations du dernier message : auteur, date et lien associé.
                    Il ne faut pas ajouter de <br> après le lien précédent (à adapter à votre css après), dans mon cas le CSS applique déjà display: block à .lastpost_link,
-                   ce qui place naturellement la suite en dessous.
+                   ce qui place naturellement la suite en dessous
               -->
               {catrow.forumrow.USER_LAST_POST}
 
@@ -260,15 +235,12 @@
 
 
         <!-- ENFANT 5 : SOUS-FORUMS
-             Cette zone est volontairement placée comme enfant direct de .forum afin de pouvoir recevoir : grid-area: subforums;
-             Le conteneur extérieur gère la hauteur et le débordement. Le span intérieur contient les liens produits par Forumactif.
+             Cette zone est installée comme enfant direct de .forum pour pouvoir recevoir : grid-area: subforums;
+             Le conteneur extérieur gère la hauteur et le débordement + le span intérieur contient les liens produits par Forumactif
         -->
         <div class="forum_details forum_subforums">
 
-          <span
-            id="subforum"
-            class="subforum"
-          >
+          <span id="subforum" class="subforum">
             {catrow.forumrow.L_LINKS}
             {catrow.forumrow.LINKS}
           </span>
@@ -298,7 +270,7 @@
     </div>
     <!--
          Fermeture de .forums. Cette fermeture arrive seulement après tous les forums.
-         Ainsi, toutes les cartes .forum d'une même catégorie se trouvent bien dans la même grille.
+         Ainsi, toutes les cartes .forum d'une même catégorie se trouvent bien dans la même grille
     -->
 
   </div>
@@ -316,7 +288,7 @@
 
   /*
    * Met à jour les informations accessibles du bouton
-   * selon la disposition actuellement affichée.
+   * selon la disposition actuellement affichée
    */
   function updateButton(button) {
     var columnsActive =
@@ -435,3 +407,4 @@
   }
 })();
 </script>
+
